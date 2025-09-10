@@ -30,13 +30,16 @@ class VFSgui:
         self.output_text.config(state='disabled')
         self.output_text.see(END)
 
-    def parco(self, command_line):
-        if not command_line.strip():                                # проверка на пустоту
+    def parco(self, input_text):
+        if not input_text.strip():
             return None, []
 
-        parts = command_line.strip().split()                        # раздел польши
-        command = parts[0]                                          # забираем команлу
-        arguments = parts[1:] if len(parts) > 1 else []             # забираем арги
+        rts = [rt for rt in input_text.strip().split() if rt]
+        if not rts:
+            return None, []
+
+        command = rts[0]
+        arguments = rts[1:] if len(rts) > 1 else []
         return command, arguments
 
     def ex_ls(self, arguments):
