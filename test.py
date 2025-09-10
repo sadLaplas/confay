@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import scrolledtext, END
 import os
 
-
 class VFSgui:
     def __init__(self):
         self.root = tk.Tk()
