@@ -1,57 +1,56 @@
-# main.py
 import tkinter as tk
 from tkinter import scrolledtext, Entry, END
 
+class SHemu:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("GUI")
+        self.output_area = scrolledtext.ScrolledText(self.root, wrap=tk.WORD)
+        self.output_area.pack(expand=True, fill='both')
+        self.input_field = Entry(self.root)
+        self.input_field.pack(fill='x')
+        self.input_field.bind('<Return>', self.on_enter)
+        self.current_path = "/"
+        self.history = []
+        self.p_pr()
 
-class ShellEmulator:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("VFS")
-        self.current_dir = "/"
-        self.output = scrolledtext.ScrolledText(root, wrap=tk.WORD, state='disabled')
-        self.output.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+    def p_pr(self):
+        self.output_area.insert(tk.END, f"{self.current_path} ")
 
-        self.input_frame = tk.Frame(root)
-        self.input_frame.pack(padx=10, pady=10, fill=tk.X)
+    def on_enter(self, event):
+        command = self.input_field.get()
+        self.input_field.delete(0, END)
+        self.output_area.insert(tk.END, command + '\n')
+        self.pa_ex(command)
 
-        self.prompt_label = tk.Label(self.input_frame, text="user@vfs:~$ ")
-        self.prompt_label.pack(side=tk.LEFT)
-
-        self.command_entry = Entry(self.input_frame)
-        self.command_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        self.command_entry.bind("<Return>", self.execute_command)
-
-        self.log_output("Welcome to VFS Shell Emulator\n")
-
-    def log_output(self, message):
-        self.output.config(state='normal')
-        self.output.insert(tk.END, message)
-        self.output.config(state='disabled')
-        self.output.see(tk.END)
-
-    def execute_command(self, event):
-        command_line = self.command_entry.get()
-        self.command_entry.delete(0, tk.END)
-        self.log_output(f"user@vfs:~$ {command_line}\n")
-
-        parts = command_line.strip().split()
-        if not parts:
+    def pa_ex(self, command):
+        pf = command.split()
+        if not pf:
+            self.p_pr()
             return
+        cmd = pf[0]
+        args = pf[1:]
 
-        cmd = parts[0]
-        args = parts[1:]
+        self.history.append({
+            'command': cmd, 'args': args})
 
         if cmd == "exit":
+            self.output_area.insert(tk.END, "Exit\n")
             self.root.quit()
         elif cmd == "ls":
-            self.log_output(f"ls {' '.join(args)}\n")
+            self.output_area.insert(tk.END, f"Command: {cmd}, Args: {args}\n")
         elif cmd == "cd":
-            self.log_output(f"cd {' '.join(args)}\n")
+            self.output_area.insert(tk.END, f"Command: {cmd}, Args: {args}\n")
+        elif cmd == "history":
+            for entry in self.history:
+                self.output_area.insert(tk.END, f"{entry['command']} {' '.join(entry['args'])}\n")
         else:
-            self.log_output(f"Command not found: {cmd}\n")
+            self.output_area.insert(tk.END, f"Unknown command: {cmd}\n")
+        self.p_pr()
 
+    def run(self):
+        self.root.mainloop()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = ShellEmulator(root)
-    root.mainloop()
+    app = SHemu()
+    app.run()
